@@ -1,0 +1,28 @@
+Bitmap2ttf converts (monochrome) bitmap fonts into ttf fonts.
+
+There are three parts:
+
+outliner.py:
+  - Traces each bitmap into a series of polygons.
+
+convert.py:
+  - makes the polygons into svg files, and writes a script for font forge
+    to convert the svgs into a ttf font.
+
+loader of your choice/implementation:
+  - currently there is only one loader:
+
+    pcftotty.ph:
+      - loader for PCF bitmap fonts. 
+        usage: ./pcftottf.py font.pcf
+
+The program is structured to make it easy to implement a loader for a font 
+format of your choice. All you need is to supply a dict object to convert.py
+which contains contains the key=>value pairs: 
+
+character unicode value => ((w, 0), (l, d-y, x+l, d), (0, 0, x, y), bitmap)
+
+OK, that's a little crazy, and I forgot what all the values mean.
+
+I have code to load Amiga font format, which I will add shortly. When I do
+that I'll improve this documentation as well.

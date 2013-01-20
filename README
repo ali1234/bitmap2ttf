@@ -12,13 +12,19 @@ convert.py:
 loader of your choice/implementation:
   - currently there is only one loader:
 
-    pcftotty.ph:
+    pcftotty.py:
       - loader for PCF bitmap fonts. 
         usage: ./pcftottf.py font.pcf
+
+    amigatottf.py
+      - loader for amiga diskfonts (eg topaz)
+        usage: ./amigatottf.py topaz/11
+        Amiga diskfonts are multiple files in a directory. 
+        The output will be named after the directory.
 
 The program is structured to make it easy to implement a loader for a font 
 format of your choice. All you need is to supply a dict object to convert.py
 which contains contains the key=>value pairs: 
 
-character unicode value => bitmap
+character unicode value => Image
 

@@ -83,4 +83,7 @@ if __name__ == '__main__':
     from convert import convert
     for filename in sys.argv[1:]:
         p = PcfFontFileUnicode(file(filename))
-        convert(p.glyph, filename[:-4])
+        glyphmap = {}
+        for k,v in p.glyph.iteritems():
+            glyphmap[k] = v[3]
+        convert(glyphmap, filename[:-4])

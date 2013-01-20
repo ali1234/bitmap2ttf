@@ -64,7 +64,7 @@ def convert(glyphs, name, par=1):
     print path
 
     for i,v in glyphs.iteritems():
-        img = ImageOps.invert(v[3].convert("L"))
+        img = ImageOps.invert(v.convert("L"))
         polygons = outliner(img)
         (xdim, ydim) = img.size
         svg = path_to_svg(polygons, xdim, ydim, par)
@@ -81,7 +81,7 @@ def convert(glyphs, name, par=1):
     pe.write('Reencode("unicode")\n')
 
     for i,v in glyphs.iteritems():
-        (xdim, ydim) = v[3].size
+        (xdim, ydim) = v.size
         pe.write('SelectSingletons(UCodePoint(%d))\n' % i)
         pe.write('Import("%s/%05d.svg", 0)\n' % (path, i))
         pe.write('SetWidth(%d)\n' % int(par*xdim*1000/ydim))

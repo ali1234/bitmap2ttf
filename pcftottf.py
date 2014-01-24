@@ -10,7 +10,10 @@
 # * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # * GNU General Public License for more details.
 
-from PcfFontFile import *
+try:
+    from PIL.PcfFontFile import *
+except ImportError:
+    from PcfFontFile import *
 
 class PcfFontFileUnicode(PcfFontFile):
     def __init__(self, fp):

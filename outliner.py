@@ -1,5 +1,7 @@
-import Image
-import ImageOps
+try:
+    from PIL import Image, ImageOps
+except ImportError:
+    import Image, ImageOps
 
 # ccw & intersect from:
 # http://www.bryceboe.com/2006/10/23/line-segment-intersection-algorithm/

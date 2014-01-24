@@ -13,7 +13,10 @@
 # * GNU General Public License for more details.
 
 import tempfile, os, subprocess, shutil, optparse
-import Image, ImageChops, ImageOps
+try:
+    from PIL import Image, ImageChops, ImageOps
+except ImportError:
+    import Image, ImageChops, ImageOps
 from itertools import *
 from math import sqrt, floor, ceil
 

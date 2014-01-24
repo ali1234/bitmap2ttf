@@ -12,7 +12,10 @@
 
 from struct import unpack
 
-import Image
+try:
+	from PIL import Image
+except ImportError:
+	import Image
 
 class AmigaFont(object):
 

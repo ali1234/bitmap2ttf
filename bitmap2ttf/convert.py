@@ -1,8 +1,6 @@
-#! /usr/bin/env python
-
 # licenced GPL v2
 # Copyright (c) 2010 Kyle Keen
-# Copyright (c) 2011 Alistair Buxton <a.j.buxton@gmail.com>
+# Copyright (c) 2011-2019 Alistair Buxton <a.j.buxton@gmail.com>
 
 # * License: This program is free software; you can redistribute it and/or
 # * modify it under the terms of the GNU General Public License as published
@@ -17,16 +15,15 @@ try:
     from PIL import Image, ImageChops, ImageOps
 except ImportError:
     import Image, ImageChops, ImageOps
-from itertools import *
-from math import sqrt, floor, ceil
+
+from tqdm import tqdm
 
 join = os.path.join
 basename = os.path.basename
 splitext = os.path.splitext
 
-import sys
 
-from outliner import outliner
+from .outliner import outliner
 
 # requires Python Image Library, Fontforge
 
@@ -62,11 +59,10 @@ def call_status(cmd):
 
 def convert(glyphs, name, par=1):
 
-    ttf = name+'.ttf'
+    ttf = name
     path = tempfile.mkdtemp()
-    print path
 
-    for i,v in glyphs.iteritems():
+    for i,v in glyphs.items():
         img = ImageOps.invert(v.convert("L"))
         polygons = outliner(img)
         (xdim, ydim) = img.size
@@ -83,22 +79,18 @@ def convert(glyphs, name, par=1):
     pe.write('SetTTFName(0x409, 6, "%s")\n' % name)
     pe.write('Reencode("unicode")\n')
 
-    for i,v in glyphs.iteritems():
+    for i,v in glyphs.items():
         (xdim, ydim) = v.size
         pe.write('SelectSingletons(UCodePoint(%d))\n' % i)
         pe.write('Import("%s/%05d.svg", 0)\n' % (path, i))
         pe.write('SetWidth(%d)\n' % int(par*xdim*1000/ydim))
         pe.write('SetVWidth(1000)\n')
 
-    print xdim, ydim
-
-    #pe.write('Save("%s")\n' % ttf)
     pe.write('Generate("%s")\n' % ttf)
     pe.close()
 
     call_status('fontforge -script %s' % join(path, ttf+'.pe'))
     shutil.rmtree(path)
 
-    print ttf
 
 

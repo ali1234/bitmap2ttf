@@ -9,6 +9,7 @@
 # * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # * GNU General Public License for more details.
+import click
 
 try:
     from PIL.PcfFontFile import *
@@ -20,7 +21,7 @@ class PcfFontFileUnicode(PcfFontFile):
 
         magic = l32(fp.read(4))
         if magic != PCF_MAGIC:
-            raise SyntaxError, "not a PCF file"
+            raise SyntaxError("not a PCF file")
 
         FontFile.FontFile.__init__(self)
 
@@ -45,7 +46,7 @@ class PcfFontFileUnicode(PcfFontFile):
         c = 0
         cu = 0
 
-        for ch,ix in encoding.iteritems():
+        for ch,ix in encoding.items():
             if ix is not None:
                 x, y, l, r, w, a, d, f = metrics[ix]
                 glyph = (w, 0), (l, d-y, x+l, d), (0, 0, x, y), bitmaps[ix]
@@ -53,8 +54,6 @@ class PcfFontFileUnicode(PcfFontFile):
                 if ch > 256:
                     cu += 1
                 self.glyph[ch] = glyph
-
-        print c, "glyphs,", cu, "unicode."
 
     def _load_encoding(self):
 
@@ -81,12 +80,13 @@ class PcfFontFileUnicode(PcfFontFile):
         return encoding
 
 
-if __name__ == '__main__':
-    import sys
-    from convert import convert
-    for filename in sys.argv[1:]:
-        p = PcfFontFileUnicode(file(filename))
-        glyphmap = {}
-        for k,v in p.glyph.iteritems():
-            glyphmap[k] = v[3]
-        convert(glyphmap, filename[:-4])
+@click.command()
+@click.argument('pcffont', type=click.File('rb'), required=True)
+@click.argument('ttf', type=click.Path(exists=False), required=True)
+def pcftottf(pcffont, ttf):
+    from .convert import convert
+    f = PcfFontFileUnicode(pcffont)
+    glyphmap = {}
+    for k, v in f.glyph.items():
+        glyphmap[k] = v[3]
+    convert(glyphmap, ttf)

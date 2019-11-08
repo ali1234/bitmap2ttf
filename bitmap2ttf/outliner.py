@@ -102,11 +102,3 @@ def outliner(orig_image):
         polygons.append([tuple(map(sum, zip(x,(-1,-1)))) for x in polygon])
 
 
-if __name__ == '__main__':
-    import sys
-    image = Image.open(sys.argv[1]).convert("L")
-    polygons = outliner(image)
-    data = image.load()
-    for p in polygons:
-        print p
-

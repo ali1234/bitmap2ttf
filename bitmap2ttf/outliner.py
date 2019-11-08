@@ -1,9 +1,3 @@
-try:
-    from PIL import Image, ImageOps
-except ImportError:
-    import Image, ImageOps
-
-
 # ccw & intersect from:
 # http://www.bryceboe.com/2006/10/23/line-segment-intersection-algorithm/
 # Note: does not handle colinearity, but does not matter here because our 
@@ -20,6 +14,11 @@ except ImportError:
 # * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # * GNU General Public License for more details.
+
+try:
+    from PIL import Image, ImageOps
+except ImportError:
+    import Image, ImageOps
 
 
 def ccw(A, B, C):

@@ -16,6 +16,7 @@ try:
 except ImportError:
     from PcfFontFile import *
 
+
 class PcfFontFileUnicode(PcfFontFile):
     def __init__(self, fp):
 
@@ -46,10 +47,10 @@ class PcfFontFileUnicode(PcfFontFile):
         c = 0
         cu = 0
 
-        for ch,ix in encoding.items():
+        for ch, ix in encoding.items():
             if ix is not None:
                 x, y, l, r, w, a, d, f = metrics[ix]
-                glyph = (w, 0), (l, d-y, x+l, d), (0, 0, x, y), bitmaps[ix]
+                glyph = (w, 0), (l, d - y, x + l, d), (0, 0, x, y), bitmaps[ix]
                 c += 1
                 if ch > 256:
                     cu += 1
@@ -73,9 +74,9 @@ class PcfFontFileUnicode(PcfFontFile):
             encodingOffset = i16(fp.read(2))
             if encodingOffset != 0xFFFF:
                 try:
-                    encoding[i+firstCol] = encodingOffset
+                    encoding[i + firstCol] = encodingOffset
                 except IndexError:
-                    break # only load ISO-8859-1 glyphs
+                    break  # only load ISO-8859-1 glyphs
 
         return encoding
 

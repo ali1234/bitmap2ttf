@@ -44,16 +44,10 @@ class PcfFontFileUnicode(PcfFontFile):
 
         self.glyph = {}
 
-        c = 0
-        cu = 0
-
         for ch, ix in encoding.items():
             if ix is not None:
                 x, y, l, r, w, a, d, f = metrics[ix]
                 glyph = (w, 0), (l, d - y, x + l, d), (0, 0, x, y), bitmaps[ix]
-                c += 1
-                if ch > 256:
-                    cu += 1
                 self.glyph[ch] = glyph
 
     def _load_encoding(self):

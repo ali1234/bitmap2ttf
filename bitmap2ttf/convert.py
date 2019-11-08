@@ -72,7 +72,7 @@ def convert(glyphs, name, par=1):
     pe.write('SetTTFName(0x409, 6, "%s")\n' % name)
     pe.write('Reencode("unicode")\n')
 
-    for i,v in glyphs.items():
+    for i,v in tqdm(glyphs.items()):
         img = ImageOps.invert(v.convert("L"))
         polygons = outliner(img)
         (xdim, ydim) = img.size

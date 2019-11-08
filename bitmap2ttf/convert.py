@@ -10,7 +10,11 @@
 # * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # * GNU General Public License for more details.
 
-import tempfile, os, subprocess, shutil, optparse
+import os
+import shutil
+import subprocess
+import tempfile
+
 try:
     from PIL import Image, ImageChops, ImageOps
 except ImportError:
@@ -19,14 +23,6 @@ except ImportError:
 from tqdm import tqdm
 
 from .outliner import outliner
-
-join = os.path.join
-basename = os.path.basename
-splitext = os.path.splitext
-
-
-
-# requires Python Image Library, Fontforge
 
 
 def xml_wrap(tag, inner, **kwargs):
@@ -56,18 +52,12 @@ def path_to_svg(polys, xdim, ydim, par):
     return svg
 
 
-def call_status(cmd):
-    "returns exit status"
-    spp = subprocess.PIPE
-    return subprocess.Popen(cmd, shell=True, stdout=spp, stderr=spp).wait()
-
-
 def convert(glyphs, name, par=1):
 
     ttf = name
     path = tempfile.mkdtemp()
 
-    pe = open(join(path, ttf+'.pe'), 'w')
+    pe = open(os.path.join(path, ttf+'.pe'), 'w')
     pe.write('New()\n')
     pe.write('SetFontNames("%s", "%s", "%s")\n' % (name, name, name))
     pe.write('SetTTFName(0x409, 1, "%s")\n' % name)
@@ -82,7 +72,7 @@ def convert(glyphs, name, par=1):
         polygons = outliner(img)
         (xdim, ydim) = img.size
         svg = path_to_svg(polygons, xdim, ydim, par)
-        open(join(path, '%05d.svg' % i), 'w').write(svg)
+        open(os.path.join(path, '%05d.svg' % i), 'w').write(svg)
 
         pe.write('SelectSingletons(UCodePoint(%d))\n' % i)
         pe.write('Import("%s/%05d.svg", 0)\n' % (path, i))
@@ -92,7 +82,7 @@ def convert(glyphs, name, par=1):
     pe.write('Generate("%s")\n' % ttf)
     pe.close()
 
-    call_status('fontforge -script %s' % join(path, ttf+'.pe'))
+    subprocess.check_call(['fontforge', '-script', os.path.join(path, ttf+'.pe')])
     shutil.rmtree(path)
 
 

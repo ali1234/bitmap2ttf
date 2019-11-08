@@ -66,17 +66,14 @@ class PcfFontFileUnicode(PcfFontFile):
         firstCol, lastCol = i16(fp.read(2)), i16(fp.read(2))
         firstRow, lastRow = i16(fp.read(2)), i16(fp.read(2))
 
-        default = i16(fp.read(2))
+        i16(fp.read(2))  # default
 
         nencoding = (lastCol - firstCol + 1) * (lastRow - firstRow + 1)
 
         for i in range(nencoding):
             encodingOffset = i16(fp.read(2))
             if encodingOffset != 0xFFFF:
-                try:
-                    encoding[i + firstCol] = encodingOffset
-                except IndexError:
-                    break  # only load ISO-8859-1 glyphs
+                encoding[i + firstCol] = encodingOffset
 
         return encoding
 

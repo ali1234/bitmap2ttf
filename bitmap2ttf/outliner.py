@@ -54,7 +54,6 @@ def find_first(image):
     return (-1, -1)
 
 def outliner(orig_image):
-    orig_data = orig_image.load()
     image = ImageOps.expand(orig_image, 1, 255)
     
     polygons = []

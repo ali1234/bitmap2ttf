@@ -18,20 +18,23 @@ except ImportError:
 
 from tqdm import tqdm
 
+from .outliner import outliner
+
 join = os.path.join
 basename = os.path.basename
 splitext = os.path.splitext
 
 
-from .outliner import outliner
 
 # requires Python Image Library, Fontforge
+
 
 def xml_wrap(tag, inner, **kwargs):
     kw = ' '.join('%s="%s"' % (k, str(v)) for k,v in kwargs.items())
     if inner is None:
         return '<%s %s/>' % (tag, kw)
     return '<%s %s>%s</%s>\n' % (tag, kw, inner, tag)
+
 
 def path(polys, xdim, ydim, par):
     d = ""
@@ -42,6 +45,7 @@ def path(polys, xdim, ydim, par):
 
     return xml_wrap('path', None, d=d, fill=fill)
 
+
 def path_to_svg(polys, xdim, ydim, par):
     xml_path = path(polys, xdim, ydim, par)
     svg = ''
@@ -50,6 +54,7 @@ def path_to_svg(polys, xdim, ydim, par):
     svg = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd">\n' + svg
     svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + svg
     return svg
+
 
 def call_status(cmd):
     "returns exit status"

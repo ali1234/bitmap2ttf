@@ -37,8 +37,8 @@ class AmigaFont(object):
         self.charspace = diskfont[32 + pcharspace:32 + pcharspace + (self.numchars * 4)]
         self.charkern = diskfont[32 + pcharkern:32 + pcharkern + (self.numchars * 4)]
 
-    def rasterize(self, byte, one=chr(255), zero=chr(0)):
-        output = ""
+    def rasterize(self, byte, one=bytes((255,)), zero=bytes((0,))):
+        output = b""
         for i in range(8):
             if byte & (1 << i):
                 output = one + output
@@ -50,9 +50,10 @@ class AmigaFont(object):
         c = byte - (self.lochar)
         d = self.charloc[c * 4:(c + 1) * 4]
         (offs, width) = unpack(">HH", d)
-        data = b"".join(
-            [self.rasterize(ord(self.chardata[(offs >> 3) + (n * self.modulo)])) for n in range(self.ysize)])
-        return Image.fromstring("L", (width, self.ysize), data)
+        data = b"".join([
+            self.rasterize(self.chardata[(offs >> 3) + (n * self.modulo)]) for n in range(self.ysize)
+        ])
+        return Image.frombytes("L", (width, self.ysize), data)
 
     def glyphs(self):
         g = {}

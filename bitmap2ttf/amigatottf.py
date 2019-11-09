@@ -14,10 +14,7 @@ from struct import unpack
 
 import click
 
-try:
-    from PIL import Image
-except ImportError:
-    import Image
+from PIL import Image
 
 
 class AmigaFont(object):

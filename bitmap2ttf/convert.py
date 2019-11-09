@@ -15,10 +15,8 @@ import shutil
 import subprocess
 import tempfile
 
-try:
-    from PIL import Image, ImageChops, ImageOps
-except ImportError:
-    import Image, ImageChops, ImageOps
+from PIL import ImageOps
+
 
 from tqdm import tqdm
 

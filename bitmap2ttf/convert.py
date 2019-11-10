@@ -40,11 +40,11 @@ def path(polys, xdim, ydim, par):
 
 
 def path_to_svg(polys, xdim, ydim, par):
-    svg = path(polys, xdim, ydim, par)
-    svg = xml_wrap('svg', svg, width=par*xdim*1000.0/ydim, height=1000)
-    svg = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd">\n' + svg
-    svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + svg
-    return svg
+    return '\n'.join([
+        '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd">',
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+        xml_wrap('svg', path(polys, xdim, ydim, par), width=par * xdim * 1000.0 / ydim, height=1000),
+    ])
 
 
 def convert(glyphs, name, par=1):

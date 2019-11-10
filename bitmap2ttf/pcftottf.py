@@ -52,7 +52,9 @@ class PcfFontFileUnicode(PcfFontFile):
                 self.glyph[ch] = glyph
                 ad.append((a, d))
 
-        assert(all(ad[0] == adn for adn in ad[1:]))
+        if any(ad[0] != adn for adn in ad[1:]):
+            raise Exception('Inconsistent ascent and descent. This case is not handled yet. Please report a bug')
+
         self.ascent = ad[0][0]
         self.descent = ad[0][1]
 

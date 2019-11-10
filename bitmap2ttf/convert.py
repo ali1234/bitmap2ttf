@@ -31,19 +31,16 @@ def xml_wrap(tag, inner, **kwargs):
 
 
 def path(polys, xdim, ydim, par):
-    d = ""
-    for poly in polys:
-        d += 'M '+ 'L '.join(['%d %d ' % (int(x*par*1000.0/ydim),int(y*1000.0/ydim)) for (x,y) in poly]) + 'Z\n'
-
-    fill = 'currentColor'
-
-    return xml_wrap('path', None, d=d, fill=fill)
+    d = '\n'.join(
+        'M ' + 'L '.join(
+            '%d %d ' % (int(x * par * 1000.0 / ydim), int(y * 1000.0 / ydim)) for (x, y) in poly
+        ) + 'Z' for poly in polys
+    )
+    return xml_wrap('path', None, d=d, fill='currentColor')
 
 
 def path_to_svg(polys, xdim, ydim, par):
-    xml_path = path(polys, xdim, ydim, par)
-    svg = ''
-    svg = svg + xml_path
+    svg = path(polys, xdim, ydim, par)
     svg = xml_wrap('svg', svg, width=par*xdim*1000.0/ydim, height=1000)
     svg = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd">\n' + svg
     svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + svg

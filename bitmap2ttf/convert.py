@@ -49,7 +49,7 @@ def path_to_svg(polys, xdim, ydim, par):
     ])
 
 
-def convert(glyphs, name, par=1):
+def convert(glyphs, name, par=1, keep=False):
 
     ttf = name
     path = tempfile.mkdtemp()
@@ -80,13 +80,17 @@ def convert(glyphs, name, par=1):
     pe.close()
 
     subprocess.check_call(['fontforge', '-script', os.path.join(path, ttf+'.pe')])
-    shutil.rmtree(path)
+    if keep:
+        print(path)
+    else:
+        shutil.rmtree(path)
 
 
 def converter(f):
     @click.argument('ttf', type=click.Path(exists=False), required=True)
+    @click.option('-k', '--keep', is_flag=True, help='Keep intermediate files.')
     @wraps(f)
-    def _convert(ttf, *args, **kwargs):
-        convert(f(*args, **kwargs), ttf)
+    def _convert(ttf, keep, *args, **kwargs):
+        convert(f(*args, **kwargs), ttf, keep=keep)
     return _convert
 

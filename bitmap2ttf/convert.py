@@ -41,8 +41,8 @@ def path(polys, xdim, ydim, par):
 
 def path_to_svg(polys, xdim, ydim, par):
     return '\n'.join([
-        '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd">',
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
+        '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd">',
         xml_wrap('svg', path(polys, xdim, ydim, par), width=par * xdim * 1000.0 / ydim, height=1000),
     ])
 

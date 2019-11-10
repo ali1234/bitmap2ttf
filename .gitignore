@@ -1,3 +1,5 @@
 /.idea
 /*.ttf
 /*.pcf
+/*.egg-info
+*.pyc

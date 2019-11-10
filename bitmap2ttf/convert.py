@@ -52,7 +52,7 @@ def path_to_svg(polys, xdim, ydim, par):
     ])
 
 
-def convert(glyphs, name, par=1, keep=False):
+def convert(glyphs, ascent, descent, name, par=1, keep=False):
 
     ttf = name
     path = tempfile.mkdtemp()
@@ -98,8 +98,17 @@ def convert(glyphs, name, par=1, keep=False):
 def converter(f):
     @click.argument('ttf', type=click.Path(exists=False), required=True)
     @click.option('-k', '--keep', is_flag=True, help='Keep intermediate files.')
+    @click.option('-a', '--ascent', type=int, default=None, help='Override input ascent.')
+    @click.option('-d', '--descent', type=int, default=None, help='Override input descent.')
+    @click.option('-x', '--xscale', type=float, default=1.0, help='X scale.')
+    @click.option('-y', '--yscale', type=float, default=1.0, help='Y scale.')
     @wraps(f)
-    def _convert(ttf, keep, *args, **kwargs):
-        convert(f(*args, **kwargs), ttf, keep=keep)
+    def _convert(ttf, keep, ascent, descent, xscale, yscale, *args, **kwargs):
+        glyphs, _ascent, _descent = f(*args, **kwargs)
+        if ascent is not None:
+            _ascent = ascent
+        if descent is not None:
+            _descent = descent
+        convert(glyphs, _ascent, _descent, ttf, keep=keep, par=xscale/yscale)
     return _convert
 

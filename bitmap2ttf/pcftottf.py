@@ -43,12 +43,18 @@ class PcfFontFileUnicode(PcfFontFile):
         # recreate glyph structure
 
         self.glyph = {}
+        ad = []
 
         for ch, ix in encoding.items():
             if ix is not None:
                 x, y, l, r, w, a, d, f = metrics[ix]
                 glyph = (w, 0), (l, d - y, x + l, d), (0, 0, x, y), bitmaps[ix]
                 self.glyph[ch] = glyph
+                ad.append((a, d))
+
+        assert(all(ad[0] == adn for adn in ad[1:]))
+        self.ascent = ad[0][0]
+        self.descent = ad[0][1]
 
     def _load_encoding(self):
 
@@ -77,7 +83,4 @@ class PcfFontFileUnicode(PcfFontFile):
 @converter
 def pcftottf(pcffont):
     f = PcfFontFileUnicode(pcffont)
-    glyphmap = {}
-    for k, v in f.glyph.items():
-        glyphmap[k] = v[3]
-    return glyphmap
+    return {k: v[3] for k, v in f.glyph.items()}, f.ascent, f.descent

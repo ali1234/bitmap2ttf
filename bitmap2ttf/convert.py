@@ -83,6 +83,7 @@ def convert(glyphs, name, par=1, keep=False):
 
         pe.write('SetWidth(%d)\n' % int(par*xdim*1000/ydim))
         pe.write('CanonicalStart()\n')
+        pe.write('CanonicalContours()\n')
 
     pe.write('Generate("%s")\n' % ttf)
     pe.close()

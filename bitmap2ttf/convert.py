@@ -67,10 +67,10 @@ def convert(glyphs, name, par=1):
         polygons = outliner(img)
         (xdim, ydim) = img.size
         svg = path_to_svg(polygons, xdim, ydim, par)
-        open(os.path.join(path, '%05d.svg' % i), 'w').write(svg)
+        open(os.path.join(path, '%04x.svg' % i), 'w').write(svg)
 
         pe.write('SelectSingletons(UCodePoint(%d))\n' % i)
-        pe.write('Import("%s/%05d.svg", 0)\n' % (path, i))
+        pe.write('Import("%s/%04x.svg", 0)\n' % (path, i))
         pe.write('SetWidth(%d)\n' % int(par*xdim*1000/ydim))
         pe.write('SetVWidth(1000)\n')
 

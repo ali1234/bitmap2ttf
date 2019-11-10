@@ -64,7 +64,7 @@ def outliner(orig_image):
             if poly.insert(e):
                 edges.remove(e)
                 if poly.closed():
-                    polys.append(list(poly.build()))
+                    polys.append(poly.build())
                     poly = Polygon()
                 break
         else:

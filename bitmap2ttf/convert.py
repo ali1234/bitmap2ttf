@@ -14,6 +14,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import unicodedata
 from functools import wraps
 
 import click
@@ -28,11 +29,13 @@ from .outliner import outliner
 def xml_wrap(tag, inner, **kwargs):
     kw = ' '.join('%s="%s"' % (k, str(v)) for k,v in kwargs.items())
     if inner is None:
-        return '<%s %s/>' % (tag, kw)
+        return f'<%s %s/>' % (tag, kw)
     return '<%s %s>%s</%s>\n' % (tag, kw, inner, tag)
 
 
 def path(polys, xdim, ydim, par):
+    if not polys:
+        return ''
     d = '\n'.join(
         'M ' + 'L '.join(
             '%d %d ' % (int(x * par * 1000.0 / ydim), int(y * 1000.0 / ydim)) for (x, y) in poly
@@ -68,11 +71,16 @@ def convert(glyphs, name, par=1, keep=False):
         img = ImageOps.invert(v.convert("L"))
         polygons = outliner(img)
         (xdim, ydim) = img.size
-        svg = path_to_svg(polygons, xdim, ydim, par)
-        open(os.path.join(path, '%04x.svg' % i), 'w').write(svg)
-
         pe.write('SelectSingletons(UCodePoint(%d))\n' % i)
-        pe.write('Import("%s/%04x.svg", 0)\n' % (path, i))
+
+        if polygons:
+            # Only generate the svg file for non-empty glyph (ie not SPACE and similar).
+            svg = path_to_svg(polygons, xdim, ydim, par)
+            open(os.path.join(path, '%04x.svg' % i), 'w').write(svg)
+            # FontForge does not like empty SVG files, but if we just don't import anything
+            # then we get a blank glyph for this codepoint.
+            pe.write('Import("%s/%04x.svg", 0)\n' % (path, i))
+
         pe.write('SetWidth(%d)\n' % int(par*xdim*1000/ydim))
         pe.write('SetVWidth(1000)\n')
 

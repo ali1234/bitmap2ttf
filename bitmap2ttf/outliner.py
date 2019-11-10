@@ -1,11 +1,4 @@
-# ccw & intersect from:
-# http://www.bryceboe.com/2006/10/23/line-segment-intersection-algorithm/
-# Note: does not handle colinearity, but does not matter here because our 
-# polygons are grid aligned and we can choose a test line which is not.
-
-# Everything else:
-
-# Copyright 2011 Alistair Buxton <a.j.buxton@gmail.com>
+# Copyright 2019 Alistair Buxton <a.j.buxton@gmail.com>
 
 # * License: This program is free software; you can redistribute it and/or
 # * modify it under the terms of the GNU General Public License as published
@@ -15,91 +8,66 @@
 # * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # * GNU General Public License for more details.
 
+from itertools import groupby
+
 
 from PIL import ImageOps
 
-def ccw(A, B, C):
-    return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
 
+class Polygon(object):
+    def __init__(self):
+        self._start = None
+        self._end = None
+        self._edges = []
 
-def intersect(A, B, C, D):
-    return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
+    def insert(self, e):
+        if e[0] == self._end or self._end is None:
+            if self._start is None:
+                self._start = e[0]
+            self._edges.append(e)
+            self._end = e[1]
+            return True
+        return False
 
+    def closed(self):
+        return self._start == self._end
 
-def inside(A, polygon):
-    B = (-0.5, A[1])
-    count = 0
-    for i in range(len(polygon)):
-        C = polygon[i]
-        D = polygon[(i + 1) % len(polygon)]
-        if intersect(A, B, C, D):
-            count += 1
-    return count & 1 == 1
-
-
-def invert_pixels(image, polygon):
-    (x, y) = image.size
-    data = image.load()
-    for py in range(y):
-        for px in range(x):
-            if inside((px + 0.5, py + 0.5), polygon):
-                data[px, py] ^= 255
-
-
-def find_first(image):
-    (x, y) = image.size
-    data = image.load()
-    for py in range(y):
-        for px in range(x):
-            if data[px, py] == 0:
-                return (px, py)
-    # not found...
-    return (-1, -1)
+    def build(self):
+        edges = [(g[0], next(g[1])) for g in groupby(self._edges, lambda e: (e[1][0] - e[0][0], e[1][1] - e[0][1]))]
+        points = [e[1][0] for e in edges[1:]]
+        if edges[0][0] != edges[-1][0]:
+            points.append(edges[0][1][0])
+        return points
 
 
 def outliner(orig_image):
     image = ImageOps.expand(orig_image, 1, 255)
-
-    polygons = []
-
-    ds = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-    ns = [(0, 0), (-1, 0), (-1, -1), (0, -1)]
-
+    ix, iy = image.size
     data = image.load()
 
-    while True:
-        polygon = []
-        d = 0
-        (px, py) = find_first(image)
-        if (px, py) == (-1, -1):
-            # no more black pixels, terminate
-            return polygons
-        polygon.append((px, py))
-        done = False
-        while not done:
-            (x, y) = map(sum, zip((px, py), ns[d]))
-            (x1, y1) = map(sum, zip((px, py), ns[(d + 3) % 4]))
-            nextr = data[x, y]
-            nextl = data[x1, y1]
-            if nextl == nextr:
-                polygon.append((px, py))
-                if nextr > 0:  # both white, turn right
-                    d = (d + 1) % 4
-                else:  # both black, turn left
-                    d = (d + 3) % 4
+    edges = set()
 
-                (px, py) = map(sum, zip((px, py), ds[d]))
+    for y in range(iy):
+        for x in range(ix):
+            if data[x, y] == 0:
+                pts = [(x,y), (x-1,y), (x-1,y-1), (x, y-1), (x, y)]
+                for a, b in zip(pts, pts[1:]):
+                    if (b, a) in edges:
+                        edges.remove((b, a))
+                    else:
+                        edges.add((a, b))
 
-            else:
-                if nextl > 0:  # left white, right black - go straight
-                    (px, py) = map(sum, zip((px, py), ds[d]))  # dont append
-                else:  # turning dilemma, go ... left
-                    polygon.append((px, py))
-                    d = (d + 3) % 4
-                    (px, py) = map(sum, zip((px, py), ds[d]))
-            if (px, py) == polygon[0]:
-                done = True
+    polys = []
+    poly = Polygon()
+    while edges:
+        for e in edges:
+            if poly.insert(e):
+                edges.remove(e)
+                if poly.closed():
+                    polys.append(list(poly.build()))
+                    poly = Polygon()
+                break
+        else:
+            raise Exception("Polygon could not be closed.")
 
-        invert_pixels(image, polygon)
-
-        polygons.append([tuple(map(sum, zip(x, (-1, -1)))) for x in polygon])
+    return polys

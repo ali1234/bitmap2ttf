@@ -8,47 +8,34 @@
 # * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # * GNU General Public License for more details.
 
+from collections import defaultdict
 
 from PIL import ImageOps
 
 
-class PolygonBuilder(object):
-    def __init__(self):
-        self._edges = set()
-
-    def add(self, edge):
-        edge = tuple(sorted(edge))
-        if edge in self._edges:
-            self._edges.remove(edge)
-        else:
-            self._edges.add(edge)
-
-    def build(self):
-        edges = self._edges.copy()
-
-        polys = []
-        while edges:
-            poly = []
-            a, b = edges.pop()
-            #TODO: implement the rest of this
-            pass
-
-        return polys
-
-
 def outliner(orig_image):
     image = ImageOps.expand(orig_image, 1, 255)
-    print(image)
     ix, iy = image.size
     data = image.load()
 
-    pb = PolygonBuilder()
+    edges = set()
 
     for y in range(iy):
         for x in range(ix):
             if data[x, y] == 0:
                 pts = [(x,y), (x+1,y), (x+1,y+1), (x, y+1), (x, y)]
                 for a, b in zip(pts, pts[1:]):
-                    pb.add((a, b))
+                    if (b, a) in edges:
+                        edges.remove((b, a))
+                    else:
+                        edges.add((a, b))
 
-    return pb.build()
+    polys = defaultdict(list)
+    for a, b in edges:
+        polys[a].append(b)
+        polys[b] = polys[a]
+        del polys[a]
+
+    print(list(polys.values()))
+
+    return list(polys.values())

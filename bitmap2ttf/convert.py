@@ -14,7 +14,9 @@ import os
 import shutil
 import subprocess
 import tempfile
+from functools import wraps
 
+import click
 from PIL import ImageOps
 
 
@@ -81,4 +83,10 @@ def convert(glyphs, name, par=1):
     shutil.rmtree(path)
 
 
+def converter(f):
+    @click.argument('ttf', type=click.Path(exists=False), required=True)
+    @wraps(f)
+    def _convert(ttf, *args, **kwargs):
+        convert(f(*args, **kwargs), ttf)
+    return _convert
 

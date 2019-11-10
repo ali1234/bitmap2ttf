@@ -16,6 +16,7 @@ import click
 
 from PIL import Image
 
+from .convert import converter
 
 class AmigaFont(object):
 
@@ -64,8 +65,7 @@ class AmigaFont(object):
 
 @click.command()
 @click.argument('amigafont', type=click.File('rb'), required=True)
-@click.argument('ttf', type=click.Path(exists=False), required=True)
-def amigatottf(amigafont, ttf):
-    from .convert import convert
+@converter
+def amigatottf(amigafont):
     f = AmigaFont(amigafont)
-    convert(f.glyphs(), ttf)
+    return f.glyphs()

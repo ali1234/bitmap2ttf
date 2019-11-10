@@ -14,6 +14,8 @@ import click
 
 from PIL.PcfFontFile import *
 
+from .convert import converter
+
 
 class PcfFontFileUnicode(PcfFontFile):
     def __init__(self, fp):
@@ -72,11 +74,10 @@ class PcfFontFileUnicode(PcfFontFile):
 
 @click.command()
 @click.argument('pcffont', type=click.File('rb'), required=True)
-@click.argument('ttf', type=click.Path(exists=False), required=True)
-def pcftottf(pcffont, ttf):
-    from .convert import convert
+@converter
+def pcftottf(pcffont):
     f = PcfFontFileUnicode(pcffont)
     glyphmap = {}
     for k, v in f.glyph.items():
         glyphmap[k] = v[3]
-    convert(glyphmap, ttf)
+    return glyphmap

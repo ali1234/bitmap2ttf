@@ -33,7 +33,8 @@ class Polygon(object):
         return self._start == self._end
 
     def build(self):
-        edges = [(g[0], next(g[1])) for g in groupby(self._edges, lambda e: (e[1][0] - e[0][0], e[1][1] - e[0][1]))]
+        edge_direction = lambda e: tuple(b - a for a, b in zip(*e))
+        edges = [(g[0], next(g[1])) for g in groupby(self._edges, key=edge_direction)]
         points = [e[1][0] for e in edges[1:]]
         if edges[0][0] != edges[-1][0]:
             points.append(edges[0][1][0])

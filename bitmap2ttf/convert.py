@@ -9,7 +9,7 @@
 # * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # * GNU General Public License for more details.
-
+import math
 import os
 import shutil
 import subprocess
@@ -33,27 +33,30 @@ def xml_wrap(tag, inner, **kwargs):
     return '<%s %s>%s</%s>\n' % (tag, kw, inner, tag)
 
 
-def path(polys, xdim, ydim, par):
+def path(polys, xdim, ydim, em, par):
     if not polys:
         return ''
     d = '\n'.join(
         'M ' + 'L '.join(
-            '%d %d ' % (int(x * par * 1000.0 / ydim), int(y * 1000.0 / ydim)) for (x, y) in poly
+            '%d %d ' % (int(x * par * em / ydim), int(y * em / ydim)) for (x, y) in poly
         ) + 'Z' for poly in polys
     )
     return xml_wrap('path', None, d=d, fill='currentColor')
 
 
-def path_to_svg(polys, xdim, ydim, par):
+def path_to_svg(polys, xdim, ydim, em, par):
     return '\n'.join([
         '<?xml version="1.0" encoding="UTF-8" standalone="no"?>',
         '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd">',
-        xml_wrap('svg', path(polys, xdim, ydim, par), width=par * xdim * 1000.0 / ydim, height=1000),
+        xml_wrap('svg', path(polys, xdim, ydim, em, par), width=int(par * xdim * em) / ydim, height=em),
     ])
 
 
 def convert(glyphs, ascent, descent, name, par=1, keep=False):
 
+    em = 1000
+    scale = em / (ascent + descent)
+    print(ascent, descent)
     ttf = name
     path = tempfile.mkdtemp()
 
@@ -65,6 +68,7 @@ def convert(glyphs, ascent, descent, name, par=1, keep=False):
     pe.write('SetTTFName(0x409, 4, "%s")\n' % name)
     pe.write('SetTTFName(0x409, 5, "1.0")\n')
     pe.write('SetTTFName(0x409, 6, "%s")\n' % name)
+    pe.write('ScaleToEm(%d, %d)\n' % (int(ascent*scale), int(descent*scale)))
     pe.write('Reencode("unicode")\n')
 
     for i,v in tqdm(glyphs.items()):
@@ -75,13 +79,13 @@ def convert(glyphs, ascent, descent, name, par=1, keep=False):
 
         if polygons:
             # Only generate the svg file for non-empty glyph (ie not SPACE and similar).
-            svg = path_to_svg(polygons, xdim, ydim, par)
+            svg = path_to_svg(polygons, xdim, ydim, em, par)
             open(os.path.join(path, '%04x.svg' % i), 'w').write(svg)
             # FontForge does not like empty SVG files, but if we just don't import anything
             # then we get a blank glyph for this codepoint.
             pe.write('Import("%s/%04x.svg", 0)\n' % (path, i))
 
-        pe.write('SetWidth(%d)\n' % int(par*xdim*1000/ydim))
+        pe.write('SetWidth(%d)\n' % int(par*xdim*em/ydim))
         pe.write('CanonicalStart()\n')
         pe.write('CanonicalContours()\n')
 

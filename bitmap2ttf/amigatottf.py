@@ -68,6 +68,6 @@ class AmigaFont(object):
 @converter
 def amigatottf(amigafont):
     f = AmigaFont(amigafont)
-    ascent = f.baseline
-    descent = f.ysize - f.baseline
+    ascent = f.baseline + 1
+    descent = f.ysize - ascent
     return f.glyphs(), ascent, descent

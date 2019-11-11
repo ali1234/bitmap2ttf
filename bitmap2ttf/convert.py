@@ -34,8 +34,6 @@ def xml_wrap(tag, inner, **kwargs):
 
 
 def path(polys, xdim, ydim, em, par):
-    if not polys:
-        return ''
     d = '\n'.join(
         'M ' + 'L '.join(
             '%d %d ' % (int(x * par * em / ydim), int(y * em / ydim)) for (x, y) in poly

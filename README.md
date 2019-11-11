@@ -2,31 +2,37 @@ Bitmap2ttf converts (monochrome) bitmap fonts into ttf fonts.
 
 There are three parts:
 
-outliner.py:
-  - Traces each bitmap into a series of polygons.
+- outliner.py:
 
-convert.py:
-  - makes the polygons into svg files, and writes a script for font forge
+    Traces each bitmap into a series of polygons.
+
+- convert.py:
+
+    Makes the polygons into svg files, and writes a script for font forge
     to convert the svgs into a ttf font.
 
-loader of your choice/implementation:
-  - currently there is only one loader:
+- loader of your choice/implementation:
 
-    pcftotty.py:
-      - loader for PCF bitmap fonts. 
-        usage: ./pcftottf.py font.pcf
+    - pcftotty.py:
 
-    amigatottf.py
-      - loader for amiga diskfonts (eg topaz)
-        usage: ./amigatottf.py topaz/11
+        Loader for PCF bitmap fonts. 
+        Usage: `pcftottf font.pcf font.ttf`
+
+    - amigatottf.py
+    
+        Loader for amiga diskfonts (eg topaz).
+        Usage: `amigatottf topaz/11 topaz.ttf`
         Amiga diskfonts are multiple files in a directory. 
         The output will be named after the directory.
 
-The program is structured to make it easy to implement a loader for a font 
-format of your choice. All you need is to supply a dict object to convert.py
-which contains contains the key=>value pairs: 
+    - Something else
+    
+        The program is structured to make it easy to implement a loader
+        for a font format of your choice. Define a click command to load
+        the font, wrap it with `@converter` and make it return a tuple
+        containing `(glyphs, ascent, descent)` where `glyphs` is a dict
+        of `{codepoint: bitmap}` mappings.
 
-character unicode value => Image
 
 Scaling
 
@@ -62,8 +68,9 @@ whether a particular body of text should have the right aspect ratio.
 Depending on the font renderer and intended purpose of the font, you
 might get better results with one or the other.
 
-The bitmap2ttf converters accept a horizontal and vertical scaling factor.
-Note however that only the ratio between them is important. A font will
-always be displayed 20px tall and with the horizontal width scaled to
-match regardless of its internal dimensions. So scaling 2x in both directions
-will have no visible effect on the resulting font.
+The bitmap2ttf converters accept a horizontal and vertical scaling
+factor in the `--xscale` and `--yscale` options. Note however that only
+the ratio between them is important. A font will always be displayed
+20px tall and with the horizontal width scaled to match regardless of
+its internal dimensions. So scaling 2x in both directions will have no
+visible effect on the resulting font.

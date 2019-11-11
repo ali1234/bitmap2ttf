@@ -62,7 +62,6 @@ whether a particular body of text should have the right aspect ratio.
 Depending on the font renderer and intended purpose of the font, you
 might get better results with one or the other.
 
-TODO:
 The bitmap2ttf converters accept a horizontal and vertical scaling factor.
 Note however that only the ratio between them is important. A font will
 always be displayed 20px tall and with the horizontal width scaled to

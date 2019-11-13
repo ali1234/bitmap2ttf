@@ -69,6 +69,6 @@ def outliner(orig_image):
                     poly = Polygon()
                 break
         else:
-            raise Exception("Polygon could not be closed.")
+            assert False, "Polygon could not be closed."
 
     return polys

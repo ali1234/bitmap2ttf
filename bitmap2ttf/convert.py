@@ -66,6 +66,8 @@ def convert(glyphs, ascent, descent, name, par=1, keep=False):
     pe.write('SetTTFName(0x409, 4, "%s")\n' % name)
     pe.write('SetTTFName(0x409, 5, "1.0")\n')
     pe.write('SetTTFName(0x409, 6, "%s")\n' % name)
+    pe.write('SetOS2Value("HHeadLineGap", 0)\n')
+    pe.write('SetOS2Value("TypoLineGap", 0)\n')
     pe.write('ScaleToEm(%d, %d)\n' % (int(ascent*scale), int(descent*scale)))
     pe.write('Reencode("unicode")\n')
 

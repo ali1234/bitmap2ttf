@@ -69,7 +69,7 @@ def convert(glyphs, ascent, descent, name, par=1, keep=False):
     pe.write('SetOS2Value("HHeadLineGap", 0)\n')
     pe.write('SetOS2Value("TypoLineGap", 0)\n')
     pe.write('ScaleToEm(%d, %d)\n' % (int(ascent*scale), int(descent*scale)))
-    pe.write('Reencode("unicode")\n')
+    pe.write('Reencode("unicode4")\n')
 
     for i,v in tqdm(glyphs.items()):
         img = ImageOps.invert(v.convert("L"))

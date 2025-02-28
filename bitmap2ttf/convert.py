@@ -80,10 +80,15 @@ def convert(glyphs, ascent, descent, name, par=1, keep=False):
         if polygons:
             # Only generate the svg file for non-empty glyph (ie not SPACE and similar).
             svg = path_to_svg(polygons, xdim, ydim, em, par)
-            open(os.path.join(path, '%04x.svg' % i), 'w').write(svg)
+            svg_path = os.path.join(path, "%04x.svg" % i)
+            open(svg_path, 'w').write(svg)
+            # We need to escape backslashes on Windows,
+            # otherwise FontForge will treat them as escapes for characters in the path
+            if os.path.sep == '\\':
+                svg_path = svg_path.replace("\\", "\\\\")
             # FontForge does not like empty SVG files, but if we just don't import anything
             # then we get a blank glyph for this codepoint.
-            pe.write('Import("%s/%04x.svg", 0)\n' % (path, i))
+            pe.write('Import("%s", 0)\n' % svg_path)
 
         pe.write('SetWidth(%d)\n' % int(par*xdim*em/ydim))
         pe.write('CanonicalStart()\n')
